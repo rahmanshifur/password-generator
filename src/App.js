@@ -10,6 +10,7 @@ function App() {
   const [includeLowercase, setIncludeLowercase] = useState(false);
   const [includeSymbols, setIncludeSymbols] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [error, setError] = useState({})
 
   const generatePassword = () => {
     let charset = '';
@@ -18,11 +19,26 @@ function App() {
     if (includeLowercase) charset += 'abcdefghijklmnopqrstuvwxyz';
     if (includeSymbols) charset += '!@#$%^&*()_+-=[]{}|;:,.<>?';
 
-    let generatedPassword = '';
-    for (let i = 0; i < length; i++) {
-      generatedPassword += charset.charAt(Math.floor(Math.random() * charset.length));
+    let newError = {};
+    let isvalid = true;
+
+    if (!includeLowercase && !includeNumbers && !includeSymbols && !includeUppercase) {
+      newError = {
+        ...newError,
+        general: 'At least one field is required!'
+      }
+      isvalid = false;
     }
-    setPassword(generatedPassword);
+    if (isvalid) {
+      let generatedPassword = '';
+      for (let i = 0; i < length; i++) {
+        generatedPassword += charset.charAt(Math.floor(Math.random() * charset.length));
+      }
+      setPassword(generatedPassword);
+      setError({})
+    } else {
+      setError(newError)
+    }
   };
 
   const resetForm = () => {
@@ -32,6 +48,7 @@ function App() {
     setIncludeUppercase(false);
     setIncludeLowercase(false);
     setIncludeSymbols(false);
+    setError({})
   };
 
   return (
@@ -44,6 +61,7 @@ function App() {
           setCopied={setCopied}
         />
       )}
+      {error && error.general && <p className='text-danger h4 text-center mb-5'>{error.general}</p>}
       <div className="form-group">
         <label>Password Length:</label>
         <input
